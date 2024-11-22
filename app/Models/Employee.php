@@ -20,6 +20,8 @@ class Employee extends Model
         'department_id',
         'phone_number',
         'hire_date',
+        'original_image_url',
+        'thumbnail_50_image_url'
     ];
 
     public function department() 

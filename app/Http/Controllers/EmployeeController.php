@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Http\Requests\StoreEmployeeRequest;
-use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Resources\EmployeeResource;
 use Inertia\Inertia;
 
@@ -20,21 +19,14 @@ class EmployeeController extends Controller
             'employees' => fn () => EmployeeResource::collection($employees)
         ]);
     }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreEmployeeRequest $request)
     {
-        //
+        Employee::create($request->validated());
+
+        return to_route('Employees.index')->with('message', 'Successfully added employee');
     }
 
     /**
@@ -42,23 +34,18 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Employee $employee)
-    {
-        //
+        return Inertia::render('Employees/Show', compact($employee));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateEmployeeRequest $request, Employee $employee)
+    public function update(StoreEmployeeRequest $request, Employee $employee)
     {
-        //
+        $employee->update($request->validated());
+
+        return to_route('employees.show', compact($employee))
+            ->with('message', 'Successfully updated employee information');
     }
 
     /**
@@ -66,6 +53,7 @@ class EmployeeController extends Controller
      */
     public function destroy(Employee $employee)
     {
-        //
+        $employee->delete();
+        return to_route('employees.index')->with('message', 'Successfully deleted');
     }
 }

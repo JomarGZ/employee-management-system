@@ -19,10 +19,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone_number')->nullable();
             $table->string('position')->nullable();
-            $table->string('hire_date')->nullable();
+            $table->date('hire_date')->nullable();
             $table->decimal('salary')->nullable();
             $table->string('status')->nullable();
-            $table->string('thumbnail_300_image_url')->nullable();
+            $table->string('original_image_url')->nullable();
             $table->string('thumbnail_50_image_url')->nullable();
             $table->foreignIdFor(Department::class)->nullable();
             $table->timestamps();
