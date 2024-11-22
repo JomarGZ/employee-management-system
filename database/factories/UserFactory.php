@@ -2,10 +2,14 @@
 
 namespace Database\Factories;
 
+use App\Models\Department;
 use App\Models\Team;
 use App\Models\User;
+use App\StatusesEnum;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Jetstream\Features;
 
@@ -26,8 +30,10 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $departments = Department::pluck('id');
         return [
-            'name' => fake()->name(),
+            'first_name' => fake()->firstName(),
+            'last_name' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
@@ -69,4 +75,5 @@ class UserFactory extends Factory
             'ownedTeams'
         );
     }
+
 }
