@@ -22,8 +22,7 @@ return new class extends Migration
             $table->date('hire_date')->nullable();
             $table->decimal('salary')->nullable();
             $table->string('status')->nullable();
-            $table->string('original_image_url')->nullable();
-            $table->string('thumbnail_50_image_url')->nullable();
+            $table->string('image_url')->nullable();
             $table->foreignIdFor(Department::class)->nullable();
             $table->timestamps();
         });

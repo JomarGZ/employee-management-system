@@ -23,5 +23,5 @@ Route::middleware([
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
-    Route::resource('Employees', EmployeeController::class);
+    Route::resource('employees', EmployeeController::class);
 });

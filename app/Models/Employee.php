@@ -20,12 +20,17 @@ class Employee extends Model
         'department_id',
         'phone_number',
         'hire_date',
-        'original_image_url',
+        'image_url',
         'thumbnail_50_image_url'
     ];
 
     public function department() 
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function getFullNameAttribute()
+    {
+        return trim("{$this->first_name} {$this->last_name}");
     }
 }
