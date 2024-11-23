@@ -24,4 +24,5 @@ Route::middleware([
     })->name('dashboard');
 
     Route::resource('employees', EmployeeController::class);
+    Route::get('app/export', [EmployeeController::class, 'exportCSV'])->name('export');
 });

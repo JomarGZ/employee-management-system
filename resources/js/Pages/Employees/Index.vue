@@ -5,6 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import debounce from 'lodash.debounce';
+import axios from 'axios';
 const props = defineProps({
     employees: Object,
     departments: Object,
@@ -74,6 +75,8 @@ const updateEmployeeRequest = async (form, onSuccess, employee) => {
   
 }
 
+
+
 const refetchEmployeeData = async (params) => {
     const {
         search,
@@ -100,6 +103,9 @@ const refetchEmployeeData = async (params) => {
     }
 }
 
+const exportCSV = async () => {
+     await axios.get(route('export'))
+}
 
 </script>
 
@@ -122,13 +128,13 @@ const refetchEmployeeData = async (params) => {
                         @emitSubmitEmployeeForm="handleEmployeeSubmit"
                         v-model:selectedEmployeeToEdit="selectedEmployeeToEdit"
                     />
-                    <button class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 flex items-center">
+                    <a :href="`/app/export`" class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
                             <path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v4m0 0l-2-2m2 2l2-2" />
                         </svg>
                         Export CSV
-                    </button>
+                    </a>
                     <button class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />

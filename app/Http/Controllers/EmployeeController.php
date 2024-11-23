@@ -9,12 +9,12 @@ use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\EmployeeResource;
 use App\Models\Department;
 use App\StatusesEnum;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
-
 class EmployeeController extends Controller
 {
     /**
@@ -137,4 +137,63 @@ class EmployeeController extends Controller
         $employee->delete();
         return to_route('employees.index')->with('message', 'Successfully deleted');
     }
+
+
+    public function exportCSV()
+    {
+        try {
+            if (!Storage::disk('public')->exists('exports')) {
+                Storage::disk('public')->makeDirectory('exports');
+            }
+            $filename = 'export_employees_' . date('Y-m-d_His') . '.csv';
+            $filepath = storage_path('app/public/exports/' . $filename);
+            $createInitialCsvFile = fopen($filepath, 'w');
+            if ($createInitialCsvFile === false) {
+                throw new Exception("Unable to create file: $filepath");
+            }
+
+    
+            $headers = ['ID', 'FIRST NAME', 'LAST NAME', 'POSITION', 'DEPARTMENT', 'STATUS', 'DATE OF INPUT', 'DATE OF UPDATED INPUT'];
+            fputcsv($createInitialCsvFile, $headers);
+    
+            Employee::select(['id', 'first_name', 'last_name', 'position', 'department_id', 'status', 'hire_date', 'created_at', 'updated_at'])
+                ->with('department:id,name')
+                ->chunk(2000, function ($employees) use ($createInitialCsvFile) {
+                    foreach($employees as $employee) {
+                        $row = [
+                            $employee->id,
+                            $employee->first_name,
+                            $employee->last_name,
+                            $employee->position,
+                            $employee->department->name,
+                            $employee->status,
+                            $employee->created_at,
+                            $employee->created_at,
+                        ];
+    
+                        if (fputcsv($createInitialCsvFile, $row) === false) {
+                            throw new Exception('Failed to write CSV row');
+                        }
+                    }
+                });
+    
+            fclose($createInitialCsvFile);
+                  // Check if file exists and is readable
+            if (!Storage::disk('public')->exists('exports/' . $filename)) {
+                throw new Exception('Export file not found');
+            }
+            return Storage::disk('public')->download('exports/' . $filename);
+        } catch (Exception $e) {
+            info("Error on exportin employee CSV $e");
+            if (isset($filepath) && file_exists($filepath)) {
+                unlink($filepath);
+            }
+            return response()->json([
+                'message' => 'Failed to export CSV',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+      
+    }
+   
 }
