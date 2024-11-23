@@ -7,6 +7,9 @@ use App\StatusesEnum;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+
+use function PHPUnit\Framework\directoryExists;
+
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Employee>
  */
@@ -68,8 +71,8 @@ class EmployeeFactory extends Factory
                 $thumb = fake()->image($thumbnailDirectory, 60, 60, null, false, false);
                
                 $thumbnailPath = "{$employeeDirectory}/$thumb";
-                if (file_exists($thumbnailPath)) {
-
+                if (directoryExists($thumbnailPath)) {
+                    
                     $newThumbName = $employeeDirectory . DIRECTORY_SEPARATOR . 'thumbnail_60_' . $fileName;
                     
                     // If a file with the new name already exists, delete it first

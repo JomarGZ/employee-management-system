@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import { useForm } from '@inertiajs/vue3';
 import Modal from '../Modals/Modal.vue';
+import { ref, watch } from 'vue';
 const props = defineProps({
     isModalShow: {
         type: Boolean,
         default: false
     },
     departments: Object,
-    statuses: Array
+    statuses: Array,
+    selectedEmployeeToEdit: Object
 })
-const emit = defineEmits(['update:isModalShow', 'emitSubmitEmployeeForm']);
-
+const emit = defineEmits(['update:isModalShow', 'emitSubmitEmployeeForm', 'update:selectedEmployeeToEdit']);
 const form = useForm({
+    _method : undefined,
     first_name      : '',
     last_name       : '',
     email           : '',
@@ -23,10 +25,43 @@ const form = useForm({
     status          : '',
     image_url       : null,
 });
+const photoPreview = ref(null);
+const photoInput = ref(null);
 
+const updatePhotoPreview = () => {
+    const photo = photoInput.value.files[0];
+
+    if (!photo) return;
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        photoPreview.value = e.target.result;
+    }
+
+    reader.readAsDataURL(photo);
+}
+
+
+watch(()=> props.selectedEmployeeToEdit, (selectedEmployee) => {
+    if (!selectedEmployee) {
+        return;
+    }
+    form.first_name = selectedEmployee.first_name;   
+    form.last_name = selectedEmployee.last_name;  
+    form.email = selectedEmployee.email;           
+    form.phone_number= selectedEmployee.phone_number;    
+    form.department_id = selectedEmployee.department?.id;  
+    form.position = selectedEmployee.position;      
+    form.hire_date = selectedEmployee.hire_date;      
+    form.salary  = selectedEmployee.salary;        
+    form.status = selectedEmployee.status;
+    form._method = 'PUT';         
+});
 const emitForm = async () => {
     emit('emitSubmitEmployeeForm', {
         form,
+        employee: props.selectedEmployeeToEdit || null,
         onSuccess: () => {
             onModalClose();
         }
@@ -35,6 +70,9 @@ const emitForm = async () => {
 const onModalClose = () => {
     emit('update:isModalShow', false)
     emit('update:isModalShow', false);
+    emit('update:selectedEmployeeToEdit', null);
+    form.clearErrors();
+    photoPreview.value = null;
     form.reset();
 }
 </script>
@@ -120,14 +158,24 @@ const onModalClose = () => {
                         >
                         <p v-if="form.errors.phone_number" class="text-red-500">{{ form.errors.phone_number }}</p>
                     </div>
-
+                    <div v-show="! photoPreview && selectedEmployeeToEdit">
+                        <img :src="selectedEmployeeToEdit?.image_url?.thumbnail_60 || ''" class="rounded-full" :alt="selectedEmployeeToEdit?.full_name || ''">
+                    </div>
+                    <div v-show="photoPreview">
+                        <span 
+                            class="size-20 bg-cover bg-no-repeat bg-center bg-black rounded-full block"
+                            :style="'background-image: url(\'' + photoPreview + '\');'"
+                        />
+                    </div>
                     <div>
                         <label for="imageUrl" class="block text-gray-700 font-semibold mb-2">
                             Employee Photo
                         </label>
                         <input 
                             type="file"
+                            ref="photoInput"
                             @input="form.image_url = $event.target.files[0]"
+                            @change="updatePhotoPreview"
                             id="imageUrl" 
                             name="imageUrl" 
                             class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

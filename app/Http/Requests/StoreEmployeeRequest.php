@@ -28,11 +28,14 @@ class StoreEmployeeRequest extends FormRequest
         return [
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', Rule::unique(Employee::class, 'email')],
+            'email' => [
+                'required',
+                Rule::unique(Employee::class, 'email')
+            ],
             'phone_number' => ['required', 'string', 'max:255'],
             'position' => ['required', 'string', 'max:255'],
             'hire_date' => ['required', 'date'],
-            'salary' => ['required', 'decimal:0'],
+            'salary' => ['required'],
             'image_url' => ['required', 'image', 'mimes:png,jpg'],
             'status' => ['required', Rule::enum(StatusesEnum::class)],
             'department_id' => ['required', Rule::exists(Department::class, 'id')],

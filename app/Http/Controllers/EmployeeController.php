@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Http\Requests\StoreEmployeeRequest;
+use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\EmployeeResource;
 use App\Models\Department;
 use App\StatusesEnum;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
@@ -17,13 +20,36 @@ class EmployeeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $employees = Employee::with('department')->latest()->paginate(10);
+        $search = $request->query('search');
+        
+        $employees = Employee::query()
+            ->select([
+                'id', 
+                'department_id',
+                'first_name',
+                'last_name',
+                'status',
+                'email',
+                'salary',
+                'image_url'
+            ])
+            ->with('department')
+            ->search($search)
+            ->filterByDepartment($request->query('department_id'))
+            ->filterByStatus($request->query('status'))
+            ->latest()
+            ->paginate(5)
+            ->withQueryString();
+
         return Inertia::render('Employees/Index', [
             'employees' => fn () => EmployeeResource::collection($employees),
             'departments' => fn () => DepartmentResource::collection(Department::select('id', 'name')->get()),
-            'statuses' => fn () => StatusesEnum::cases()
+            'statuses' => fn () => StatusesEnum::cases(),
+            'filters' => [
+                'search' => $search
+            ]
         ]);
     }
     /**
@@ -70,17 +96,36 @@ class EmployeeController extends Controller
      */
     public function show(Employee $employee)
     {
-        return Inertia::render('Employees/Show', compact($employee));
+        $employee = EmployeeResource::make($employee->load('department'));   
+        return Inertia::render('Employees/Show', compact('employee'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(StoreEmployeeRequest $request, Employee $employee)
+    public function update(UpdateEmployeeRequest $request, Employee $employee)
     {
-        $employee->update($request->validated());
 
-        return to_route('employees.show', compact($employee))
+        $validated = $request->validated();
+        $employee->update([
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+            'email' => $validated['email'],
+            'phone_number' => $validated['phone_number'],
+            'department_id' => $validated['department_id'],
+            'position' => $validated['position'],
+            'hire_date' => $validated['hire_date'],
+            'salary' => $validated['salary'],
+            'status' => $validated['status'],
+        ]);
+
+        if ($request->hasFile('image_url')) {
+            Storage::disk('public')->delete('employee_images/' . $employee->id . '/*');
+            $file = $request->file('image_url');
+
+            $fileName = $file->getClientOriginalName();
+        }
+        return to_route('employees.show', compact('employee'))
             ->with('message', 'Successfully updated employee information');
     }
 
