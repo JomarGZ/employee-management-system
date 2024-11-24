@@ -34,6 +34,7 @@ class EmployeeController extends Controller
                 'department_id',
                 'first_name',
                 'last_name',
+                'position',
                 'status',
                 'email',
                 'salary',

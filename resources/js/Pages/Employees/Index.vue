@@ -6,6 +6,9 @@ import { ref, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import debounce from 'lodash.debounce';
 import ImportCsvModal from '@/Components/Employees/ImportCsvModal.vue';
+import { useAlert } from '@/Composables/useSweettAlert';
+
+const {toast, swal} = useAlert();
 const props = defineProps({
     employees: Object,
     departments: Object,
@@ -47,17 +50,39 @@ const handleEmployeeSubmit = ({form, onSuccess, employee}) => {
 }
 
 const handleDelete = (deleteEmployee) => {
-    if (confirm('Are you sure you want to delete this employee')) {
-        router.delete(route('employees.destroy', deleteEmployee), {
-            onSuccess: () => console.log('successfully deleted'),
-            preserveScroll: true,
-        });
-    }
+    swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.delete(route('employees.destroy', deleteEmployee), {
+                onSuccess: () => {
+                    toast.fire({
+                        icon: "success",
+                        title: "Employee deleted successfully"
+                    });
+                },
+                preserveScroll: true,
+            });
+        }
+    });
+  
 }
 
 const addEmployeeRequest = (form, onSuccess) => {
     form.post(route('employees.store'), {
-        onSuccess: () => onSuccess(),
+        onSuccess: () => {
+            toast.fire({
+                icon: "success",
+                title: "Employee added successfully"
+            });
+            onSuccess()
+        },
     })
 }
 
@@ -65,7 +90,13 @@ const updateEmployeeRequest = async (form, onSuccess, employee) => {
     try {
         await form.post(route('employees.update', {employee}), 
             {
-                onSuccess: () => onSuccess(),
+                onSuccess: () => {
+                    toast.fire({
+                        icon: "success",
+                        title: "Update employee successfully"
+                    });
+                    onSuccess()
+                },
                 onError: (error) => console.log('error', error)
             }
         )
@@ -101,10 +132,6 @@ const refetchEmployeeData = async (params) => {
     } catch (error) {
         console.error('Error on refetching the data', error);
     }
-}
-const csvInput = ref(null);
-const selectCsv = () => {
-    csvInput.value.click();
 }
 
 </script>
