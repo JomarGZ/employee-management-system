@@ -5,7 +5,7 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, watch } from 'vue';
 import { Link, router } from '@inertiajs/vue3';
 import debounce from 'lodash.debounce';
-import axios from 'axios';
+import ImportCsvModal from '@/Components/Employees/ImportCsvModal.vue';
 const props = defineProps({
     employees: Object,
     departments: Object,
@@ -102,9 +102,9 @@ const refetchEmployeeData = async (params) => {
         console.error('Error on refetching the data', error);
     }
 }
-
-const exportCSV = async () => {
-     await axios.get(route('export'))
+const csvInput = ref(null);
+const selectCsv = () => {
+    csvInput.value.click();
 }
 
 </script>
@@ -135,13 +135,7 @@ const exportCSV = async () => {
                         </svg>
                         Export CSV
                     </a>
-                    <button class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
-                            <path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v4m0 0l-2-2m2 2l2-2" />
-                        </svg>
-                        Import CSV
-                    </button>
+                    <ImportCsvModal />
                 </div>
             </header>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-gray-100">

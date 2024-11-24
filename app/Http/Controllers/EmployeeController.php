@@ -8,13 +8,17 @@ use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\EmployeeResource;
 use App\Models\Department;
+use App\Rules\EmployeeImportCsvRule;
 use App\StatusesEnum;
+use DateTime;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
+use Spatie\SimpleExcel\SimpleExcelReader;
+
 class EmployeeController extends Controller
 {
     /**
@@ -148,15 +152,16 @@ class EmployeeController extends Controller
             $filename = 'export_employees_' . date('Y-m-d_His') . '.csv';
             $filepath = storage_path('app/public/exports/' . $filename);
             $createInitialCsvFile = fopen($filepath, 'w');
+
             if ($createInitialCsvFile === false) {
                 throw new Exception("Unable to create file: $filepath");
             }
 
     
-            $headers = ['ID', 'FIRST NAME', 'LAST NAME', 'POSITION', 'DEPARTMENT', 'STATUS', 'DATE OF INPUT', 'DATE OF UPDATED INPUT'];
+            $headers = ['ID', 'FIRST NAME', 'LAST NAME', 'EMAIL', 'PHONE NUMBER', 'POSITION', 'HIRE DATE', 'SALARY', 'STATUS', 'DEPARTMENT', 'DATE OF INPUT', 'DATE OF UPDATED INPUT'];
             fputcsv($createInitialCsvFile, $headers);
     
-            Employee::select(['id', 'first_name', 'last_name', 'position', 'department_id', 'status', 'hire_date', 'created_at', 'updated_at'])
+            Employee::select(['id', 'first_name', 'last_name', 'email', 'phone_number', 'salary', 'position', 'department_id', 'status', 'hire_date', 'created_at', 'updated_at'])
                 ->with('department:id,name')
                 ->chunk(2000, function ($employees) use ($createInitialCsvFile) {
                     foreach($employees as $employee) {
@@ -164,9 +169,13 @@ class EmployeeController extends Controller
                             $employee->id,
                             $employee->first_name,
                             $employee->last_name,
+                            $employee->email,
+                            $employee->phone_number,
                             $employee->position,
-                            $employee->department->name,
+                            $employee->hire_date,
+                            $employee->salary,
                             $employee->status,
+                            $employee->department->name,
                             $employee->created_at,
                             $employee->created_at,
                         ];
@@ -195,5 +204,58 @@ class EmployeeController extends Controller
         }
       
     }
-   
+
+    public function importCSV(Request $request)
+    {
+        $requiredHeaders = [
+            'first name',
+            'last name',
+            'email',
+            'status',
+            'position',
+            'phone number',
+            'hire date',
+            'salary',
+        ];
+
+        $request->validate([
+            'csv_file' => ['required', 'file', 'mimes:csv', 'max:10240', new EmployeeImportCsvRule($requiredHeaders)]
+        ]);
+
+        SimpleExcelReader::create($request->file('csv_file'), 'csv')
+            ->useHeaders([
+                'id',
+                'first_name',
+                'last_name',
+                'email',
+                'phone_number',
+                'position',
+                'hire_date',
+                'salary',
+                'status'
+            ])
+            ->getRows()
+            ->each(function (array $row) {
+                $reformattedRow = [
+                    'first_name' => $row['first_name'],
+                    'last_name' => $row['last_name'],
+                    'email' => $row['email'],
+                    'phone_number' => $row['phone_number'],
+                    'position' => $row['position'],
+                    'hire_date' => (new DateTime($row['hire_date']))->format('Y-m-d'),
+                    'salary' => $row['salary'],
+                    'status' => $row['status'],
+                ];
+        
+                Employee::upsert(
+                    $reformattedRow,
+                    ['first_name', 'last_name'],  // Unique identifier columns
+                    ['email', 'status', 'position']  // Columns to update if record exists
+                );
+        
+            });
+
+        return back();
+    }
+
 }

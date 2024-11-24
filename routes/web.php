@@ -25,4 +25,5 @@ Route::middleware([
 
     Route::resource('employees', EmployeeController::class);
     Route::get('app/export', [EmployeeController::class, 'exportCSV'])->name('export');
+    Route::post('app/import', [EmployeeController::class, 'importCSV'])->name('import');
 });
