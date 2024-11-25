@@ -50,11 +50,12 @@ class EmployeeController extends Controller
             ->latest()
             ->paginate(5)
             ->withQueryString();
-
+            $getCsvExportFileStock = $request->user()->getFirstExportFile();
         return Inertia::render('Employees/Index', [
             'employees' => fn () => EmployeeResource::collection($employees),
             'departments' => fn () => DepartmentResource::collection(Department::select('id', 'name')->get()),
             'statuses' => fn () => StatusesEnum::cases(),
+            'getCsvExportFileStock' => $getCsvExportFileStock ?? [],
             'filters' => [
                 'search' => $search
             ]
@@ -150,11 +151,17 @@ class EmployeeController extends Controller
     public function exportCSV(Request $request)
     {
         try {
-            event(new ExportCsvStatusUpdated($request->user(), [
-                'message' => 'Queueing....'
-            ]));
+            $authUser = $request->user();
+            $filename = 'export_employees_' . date('Y-m-d_His') . '.csv';
+            $export = $authUser->exportFile()->create([
+                'file_name' => $filename,
+                'file_path' => Storage::disk('public')->url("exports/{$filename}"),
+                'status' => 'pending'
+            ]);
+           
+            event(new ExportCsvStatusUpdated($authUser, $export));
 
-            ExportEmployeesJob::dispatch(auth()->user());
+            ExportEmployeesJob::dispatch($authUser, $export);
 
             return response()->json([
                 'message' => 'Export started. You will be notified when it\'s ready.'
@@ -169,19 +176,21 @@ class EmployeeController extends Controller
       
     }
 
-    public function downloadExport($id)
+
+    public function exportCleanUp (Export $export) 
     {
-        $export = Export::findOrFail($id);
+       
+        Storage::disk('public')->when(
+            Storage::disk('public')->exists("exports/{$export->file_name}"),
+            fn () => Storage::disk('public')->delete("exports/{$export->file_name}")
+        );
         
-        if ($export->user_id !== auth()->id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $export->delete();
 
-        if (!Storage::disk('public')->exists($export->file_path)) {
-            return response()->json(['message' => 'File not found'], 404);
-        }
-
-        return Storage::disk('public')->download($export->file_path);
+        return response()->json([
+            'success' => true,
+        'message' => 'Successfully deleted'
+        ]);
     }
 
     public function importCSV(Request $request)

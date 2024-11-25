@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Export;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
@@ -18,19 +19,19 @@ class ExportCsvStatusUpdated implements ShouldBroadcast
 
 
     protected User $user;
+    public int $tries = 3;
+    public int $backoff = 3;
+
+    protected Export $exportedData;
     protected string $message;
-    protected $link;
     /**
      * Create a new event instance.
      */
-    public function __construct(User $user, array $payload)
+    public function __construct(User $user, Export $exportedData)
     {
         $this->user = $user;
-        $this->message = Arr::pull($payload, 'message');
+        $this->exportedData = $exportedData;
 
-        if (isset($payload['link'])) {
-            $this->link = Arr::pull($payload, 'link');
-        }
     }
 
     /**
@@ -48,7 +49,7 @@ class ExportCsvStatusUpdated implements ShouldBroadcast
     public function broadCastWith()
     {
         return [
-            'message' => $this->message
+            'exportedData' => $this->exportedData ?? null,
         ];
     }
 }

@@ -21,12 +21,14 @@ class ExportEmployeesJob implements ShouldQueue
 
    
     protected $user;
+    protected $export;
     // public $timeout = 3600; // 1 hour timeout
     // public $tries = 3; // Number of retries
 
-    public function __construct(User $user)
+    public function __construct(User $user, Export $export)
     {
         $this->user = $user;
+        $this->export = $export;
     }
 
     /**
@@ -34,34 +36,20 @@ class ExportEmployeesJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $payload = [
-            'message' => 'Exporting...'
-        ];
-        event(new ExportCsvStatusUpdated($this->user, $payload));
-
+        
         $export = $this->exportCsvEmployeees();
 
-        if ($export->status === 'pending') {
-            $payload['message'] = 'Exporting is on pending';
-        } elseif($export->status == 'completed') {
-            $payload['message'] = 'Complete!';
-            $payload['link'] = Storage::disk('public')->url($export->file_path);
-        }
+     
         
-        event(new ExportCsvStatusUpdated($this->user, $payload));
+        event(new ExportCsvStatusUpdated($this->user, $export));
     }
     
+
     public function exportCsvEmployeees()
     {
         try {
-            $filename = 'export_employees_' . date('Y-m-d_His') . '.csv';
-            $filepath = storage_path("app/public/exports/{$filename}");
-
-            $export = $this->user->exportFile()->create([
-                'file_name' => $filename,
-                'file_path' => "app/public/exports/{$filename}",
-                'status' => 'pending'
-            ]);
+            $filepath = storage_path("app/public/exports/{$this->export->file_name}");
+            
 
             if (!Storage::disk('public')->exists('exports')) {
                 Storage::disk('public')->makeDirectory('exports');
@@ -106,6 +94,7 @@ class ExportEmployeesJob implements ShouldQueue
             ->with('department:id,name')
             ->chunk(2000, function ($employees) use ($createCsvFile) {
                 foreach($employees as $employee) {
+                 
                     $row = [
                         $employee->id,
                         $employee->first_name,
@@ -128,10 +117,10 @@ class ExportEmployeesJob implements ShouldQueue
 
             fclose($createCsvFile);
 
-            $export->status = "completed";
-            $export->save();
+            $this->export->status = "completed";
+            $this->export->save();
 
-            return $export;
+            return $this->export;
 
         } catch (Exception $e) {
             if (isset($filepath) && file_exists($filepath)) {
@@ -142,8 +131,8 @@ class ExportEmployeesJob implements ShouldQueue
             \Log::error("Error exporting employee CSV: " . $e->getMessage());
             
             // Update export status if record exists
-            if (isset($export)) {
-                $export->update(['status' => 'failed']);
+            if (isset($this->export)) {
+                $this->export->update(['status' => 'failed']);
             }
             
             throw $e; // Re-throw the exception for job failure handling
