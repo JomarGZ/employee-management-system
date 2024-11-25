@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ExportCsvStatusUpdated;
 use App\Models\Employee;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\EmployeeResource;
+use App\Jobs\ExportEmployeesJob;
 use App\Models\Department;
+use App\Models\Export;
 use App\Rules\EmployeeImportCsvRule;
 use App\StatusesEnum;
 use DateTime;
@@ -144,66 +147,41 @@ class EmployeeController extends Controller
     }
 
 
-    public function exportCSV()
+    public function exportCSV(Request $request)
     {
         try {
-            if (!Storage::disk('public')->exists('exports')) {
-                Storage::disk('public')->makeDirectory('exports');
-            }
-            $filename = 'export_employees_' . date('Y-m-d_His') . '.csv';
-            $filepath = storage_path('app/public/exports/' . $filename);
-            $createInitialCsvFile = fopen($filepath, 'w');
+            event(new ExportCsvStatusUpdated($request->user(), [
+                'message' => 'Queueing....'
+            ]));
 
-            if ($createInitialCsvFile === false) {
-                throw new Exception("Unable to create file: $filepath");
-            }
+            ExportEmployeesJob::dispatch(auth()->user());
 
-    
-            $headers = ['ID', 'FIRST NAME', 'LAST NAME', 'EMAIL', 'PHONE NUMBER', 'POSITION', 'HIRE DATE', 'SALARY', 'STATUS', 'DEPARTMENT', 'DATE OF INPUT', 'DATE OF UPDATED INPUT'];
-            fputcsv($createInitialCsvFile, $headers);
-    
-            Employee::select(['id', 'first_name', 'last_name', 'email', 'phone_number', 'salary', 'position', 'department_id', 'status', 'hire_date', 'created_at', 'updated_at'])
-                ->with('department:id,name')
-                ->chunk(2000, function ($employees) use ($createInitialCsvFile) {
-                    foreach($employees as $employee) {
-                        $row = [
-                            $employee->id,
-                            $employee->first_name,
-                            $employee->last_name,
-                            $employee->email,
-                            $employee->phone_number,
-                            $employee->position,
-                            $employee->hire_date,
-                            $employee->salary,
-                            $employee->status,
-                            $employee->department->name,
-                            $employee->created_at,
-                            $employee->created_at,
-                        ];
-    
-                        if (fputcsv($createInitialCsvFile, $row) === false) {
-                            throw new Exception('Failed to write CSV row');
-                        }
-                    }
-                });
-    
-            fclose($createInitialCsvFile);
-                  // Check if file exists and is readable
-            if (!Storage::disk('public')->exists('exports/' . $filename)) {
-                throw new Exception('Export file not found');
-            }
-            return Storage::disk('public')->download('exports/' . $filename);
-        } catch (Exception $e) {
-            info("Error on exportin employee CSV $e");
-            if (isset($filepath) && file_exists($filepath)) {
-                unlink($filepath);
-            }
             return response()->json([
-                'message' => 'Failed to export CSV',
+                'message' => 'Export started. You will be notified when it\'s ready.'
+            ]);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Failed to start export',
                 'error' => $e->getMessage()
             ], 500);
         }
       
+    }
+
+    public function downloadExport($id)
+    {
+        $export = Export::findOrFail($id);
+        
+        if ($export->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        if (!Storage::disk('public')->exists($export->file_path)) {
+            return response()->json(['message' => 'File not found'], 404);
+        }
+
+        return Storage::disk('public')->download($export->file_path);
     }
 
     public function importCSV(Request $request)
@@ -258,5 +236,7 @@ class EmployeeController extends Controller
 
         return back();
     }
+
+   
 
 }

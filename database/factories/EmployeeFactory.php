@@ -16,6 +16,12 @@ use function PHPUnit\Framework\directoryExists;
  */
 class EmployeeFactory extends Factory
 {
+    protected static $shouldConfigure = true;
+
+    public static function skipConfiguration()
+    {
+        static::$shouldConfigure = false;
+    }
     /**
      * Define the model's default state.
      *
@@ -32,7 +38,7 @@ class EmployeeFactory extends Factory
             'image_url' => null,
             'salary' => fake()->numberBetween(30000, 150000),
             'hire_date' => fake()->dateTimeBetween('-20 years', 'now'),
-            'email' => fake()->unique()->safeEmail(),
+            'email' => fake()->unique()->userName() . Str::uuid() . '@example.com',
             'department_id' => $departments->random(),
             'status' => fake()->randomElement(StatusesEnum::cases()),
             'phone_number' => fake()->phoneNumber(),
@@ -42,6 +48,10 @@ class EmployeeFactory extends Factory
     
     public function configure()
     {
+          // Only proceed with image configuration if it's not skipped
+        if (!static::$shouldConfigure) {
+            return $this;
+        }
         return $this->afterCreating(function ($employee) {
             try {
                 // Create base directory if it doesn't exist
@@ -58,7 +68,7 @@ class EmployeeFactory extends Factory
                 // Generate and save original image
                 $fileName = fake()->image($employeeDirectory, 300, 300, null, false, false);
                 if (!$fileName) {
-                    return;
+                    return $this;
                 }
                 // Update filename in database
                 $employee->image_url = $fileName;

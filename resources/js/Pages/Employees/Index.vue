@@ -3,10 +3,11 @@ import AddEmployeeModal from '@/Components/Employees/AddEmployeeModal.vue';
 import EmployeeItem from '@/Components/Employees/EmployeeItem.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { ref, watch } from 'vue';
-import { Link, router } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import debounce from 'lodash.debounce';
 import ImportCsvModal from '@/Components/Employees/ImportCsvModal.vue';
 import { useAlert } from '@/Composables/useSweettAlert';
+import axios from 'axios';
 
 const {toast, swal} = useAlert();
 const props = defineProps({
@@ -15,7 +16,16 @@ const props = defineProps({
     statuses: Array,
     filters: Array
 });
+const exportCsvBtnName = ref('Export CSV');
 
+Echo.private(`App.Models.User.${usePage().props.auth.user.id}`)
+    .subscribed(function (){
+        console.log('successfully subscribed');
+    })
+    .listen('ExportCsvStatusUpdated', function (event) {
+        console.log('trigger event', event);
+        exportCsvBtnName.value = event.message;
+    });
 const isModalShow = ref(false);
 const selectedEmployeeToEdit = ref(null);
 const search = ref(props.filters?.search || '');
@@ -134,6 +144,10 @@ const refetchEmployeeData = async (params) => {
     }
 }
 
+const handleExport = async () => {
+    await axios.get(route('export'));
+}
+
 </script>
 
 <template>
@@ -155,13 +169,13 @@ const refetchEmployeeData = async (params) => {
                         @emitSubmitEmployeeForm="handleEmployeeSubmit"
                         v-model:selectedEmployeeToEdit="selectedEmployeeToEdit"
                     />
-                    <a :href="`/app/export`" class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 flex items-center">
+                    <button @click="handleExport" class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" />
                             <path stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v4m0 0l-2-2m2 2l2-2" />
                         </svg>
-                        Export CSV
-                    </a>
+                       {{ exportCsvBtnName }}
+                    </button>
                     <ImportCsvModal />
                 </div>
             </header>
