@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Department;
+use App\Models\Employee;
+use App\StatusesEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateEmployeeRequest extends FormRequest
 {
@@ -11,7 +15,7 @@ class UpdateEmployeeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +26,19 @@ class UpdateEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                Rule::unique(Employee::class, 'email')->ignore($this->employee->id)
+            ],
+            'phone_number' => ['required', 'string', 'max:255'],
+            'position' => ['required', 'string', 'max:255'],
+            'hire_date' => ['required', 'date'],
+            'salary' => ['required'],
+            'image_url' => ['sometimes', 'image', 'mimes:png,jpg'],
+            'status' => ['required', Rule::enum(StatusesEnum::class)],
+            'department_id' => ['required', Rule::exists(Department::class, 'id')],
         ];
     }
 }
