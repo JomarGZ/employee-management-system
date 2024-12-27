@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EmployeeController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,4 +22,9 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
+
+    Route::resource('employees', EmployeeController::class);
+    Route::get('export', [EmployeeController::class, 'exportCSV'])->name('export');
+    Route::delete('exports/download/{export}', [EmployeeController::class, 'exportCleanUp'])->name('employees.export.delete');
+    Route::post('import', [EmployeeController::class, 'importCSV'])->name('import');
 });
