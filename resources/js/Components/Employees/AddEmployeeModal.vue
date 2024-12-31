@@ -2,6 +2,7 @@
 import { useForm } from '@inertiajs/vue3';
 import Modal from '../Modals/Modal.vue';
 import { ref, watch } from 'vue';
+import { useHelper } from '@/Composables/useHelper';
 const props = defineProps({
     isModalShow: {
         type: Boolean,
@@ -11,6 +12,8 @@ const props = defineProps({
     statuses: Array,
     selectedEmployeeToEdit: Object
 })
+const { getInitials } = useHelper();
+
 const emit = defineEmits(['update:isModalShow', 'emitSubmitEmployeeForm', 'update:selectedEmployeeToEdit']);
 const form = useForm({
     _method : undefined,
@@ -158,8 +161,8 @@ const onModalClose = () => {
                         >
                         <p v-if="form.errors.phone_number" class="text-red-500">{{ form.errors.phone_number }}</p>
                     </div>
-                    <div v-show="! photoPreview && selectedEmployeeToEdit">
-                        <img :src="selectedEmployeeToEdit?.image_url?.thumbnail_60 || ''" class="rounded-full" :alt="selectedEmployeeToEdit?.full_name || ''">
+                    <div v-show="! photoPreview && selectedEmployeeToEdit && selectedEmployeeToEdit?.image_url?.thumbnail_60">
+                        <img :src="selectedEmployeeToEdit?.image_url?.thumbnail_60" class="rounded-full" :alt="selectedEmployeeToEdit?.full_name || ''">
                     </div>
                     <div v-show="photoPreview">
                         <span 

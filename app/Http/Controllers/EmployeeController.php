@@ -39,6 +39,8 @@ class EmployeeController extends Controller
                 'first_name',
                 'last_name',
                 'position',
+                'phone_number',
+                'hire_date',
                 'status',
                 'email',
                 'salary',
@@ -59,7 +61,7 @@ class EmployeeController extends Controller
             'departments' => fn () => DepartmentResource::collection(Department::select('id', 'name')->get()),
             'statuses' => fn () => StatusesEnum::cases(),
             'getCsvExportFileStock' => $getCsvExportFileStock ?? [],
-            'filters' => [
+            'filters' => [ 
                 'search' => $search
             ],
             'statuses_with_counts' => (new EmployeeService)->getStatusesCounts()
