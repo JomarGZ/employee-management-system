@@ -91,7 +91,7 @@ const onModalClose = () => {
         <Modal v-if="isModalShow">
             <template #header>
                 <div class="flex items-center justify-between text-centers mb-5">
-                    <h2 class="text-2xl font-bold text-center text-gray-800">Add New Employee</h2>
+                    <h2 class="text-2xl font-bold text-center text-gray-800">{{ selectedEmployeeToEdit ? 'Update Existing Employee' : 'Add New Employee' }}</h2>
                     <button @click="onModalClose" class="hover:bg-gray-100 rounded-full p-1">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
@@ -282,7 +282,7 @@ const onModalClose = () => {
                             type="submit" 
                             class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-300 font-semibold"
                         >
-                            Add Employee
+                           {{ selectedEmployeeToEdit ? 'Update Employee' : 'Add Employee' }}
                         </button>
                     </div>
                 </form>
