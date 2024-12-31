@@ -15,7 +15,7 @@ const props = defineProps({
                 <div class="flex items-center justify-between">
                     <div>
                         <h1 class="text-3xl font-bold">{{ employee.full_name }}</h1>
-                        <p class="text-blue-100">Marketing Specialist</p>
+                        <p class="text-blue-100">{{ employee.position }}</p>
                     </div>
                     <div class="text-right">
                         <span class="bg-white text-blue-600 px-3 py-1 rounded-full text-sm font-semibold">
@@ -72,7 +72,7 @@ const props = defineProps({
                     </div>
                 </div>
 
-                <div class="mt-8">
+                <!-- <div class="mt-8">
                     <h2 class="text-xl font-semibold mb-4 border-b pb-2">Employment History</h2>
                     <div class="space-y-4">
                         <div class="bg-gray-50 p-4 rounded-lg">
@@ -110,12 +110,9 @@ const props = defineProps({
                             <p class="text-gray-600">Redesigned company's social media presence and content strategy.</p>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="mt-8 flex justify-between">
-                    <button class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 flex items-center">
-                        Set Permission
-                    </button>
                     <Link :href="route('employees.index')" class="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition">
                         Back to Employee List
                     </Link>

@@ -16,12 +16,7 @@ use function PHPUnit\Framework\directoryExists;
  */
 class EmployeeFactory extends Factory
 {
-    protected static $shouldConfigure = true;
-
-    public static function skipConfiguration()
-    {
-        static::$shouldConfigure = false;
-    }
+ 
     /**
      * Define the model's default state.
      *
@@ -36,7 +31,7 @@ class EmployeeFactory extends Factory
             'last_name' => fake()->lastName(),
             'position' => fake()->jobTitle(),
             'image_url' => null,
-            'salary' => fake()->numberBetween(30000, 150000),
+            'salary' => fake()->numberBetween(500, 1000),
             'hire_date' => fake()->dateTimeBetween('-20 years', 'now'),
             'email' => fake()->unique()->userName() . Str::uuid() . '@example.com',
             'department_id' => $departments->random(),

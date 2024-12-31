@@ -15,7 +15,7 @@ const props = defineProps({
     departments: Object,
     statuses: Array,
     filters: Array,
-    statuses_with_counts: Array,
+    employee_counts: Array,
     getCsvExportFileStock: [Object, Array]
 });
 const exportCsvBtnName = ref('Export CSV');
@@ -225,7 +225,7 @@ const handleExportCleanUp = () => {
                     </div>
                     <div>
                     <p class="text-lg font-semibold text-gray-700">Total Employees</p>
-                    <p class="text-2xl font-bold text-gray-900">125</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ employee_counts?.total_employees || 0 }}</p>
                     </div>
                 </div>
 
@@ -238,7 +238,7 @@ const handleExportCleanUp = () => {
                     </div>
                     <div>
                     <p class="text-lg font-semibold text-gray-700">Active Employees</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ statuses_with_counts?.active || 0 }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ employee_counts?.statuses?.active || 0 }}</p>
                     </div>
                 </div>
 
@@ -251,7 +251,7 @@ const handleExportCleanUp = () => {
                     </div>
                     <div>
                     <p class="text-lg font-semibold text-gray-700">Inactive Employees</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ statuses_with_counts?.inactive || 0 }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ employee_counts?.statuses?.inactive || 0 }}</p>
                     </div>
                 </div>
 
@@ -264,7 +264,7 @@ const handleExportCleanUp = () => {
                     </div>
                     <div>
                     <p class="text-lg font-semibold text-gray-700">On Leave Employees</p>
-                    <p class="text-2xl font-bold text-gray-900">{{ statuses_with_counts?.on_leave || 0 }}</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ employee_counts?.statuses?.on_leave || 0 }}</p>
                     </div>
                 </div>
                 <div class="flex items-center p-4 bg-white rounded-lg shadow-md">
@@ -275,12 +275,10 @@ const handleExportCleanUp = () => {
                     </div>
                     <div>
                         <p class="text-lg font-semibold text-gray-700">Onboarding</p>
-                        <p class="text-2xl font-bold text-gray-900">{{ statuses_with_counts?.onboarding || 0 }}</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ employee_counts?.statuses?.onboarding || 0 }}</p>
                     </div>
                 </div>
             </div>
-
-
             <!-- Search and Filters -->
             <div class="mb-6 flex justify-between items-center">
                 <div class="relative w-full max-w-md">

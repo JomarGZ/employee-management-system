@@ -64,7 +64,10 @@ class EmployeeController extends Controller
             'filters' => [ 
                 'search' => $search
             ],
-            'statuses_with_counts' => (new EmployeeService)->getStatusesCounts()
+            'employee_counts' => [
+                'statuses' => (new EmployeeService)->getStatusesCounts(),
+                'total_employees' => Employee::getTotalEmployees()
+            ]
         ]);
     }
     /**
