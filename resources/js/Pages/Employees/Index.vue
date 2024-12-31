@@ -15,6 +15,7 @@ const props = defineProps({
     departments: Object,
     statuses: Array,
     filters: Array,
+    statuses_with_counts: Array,
     getCsvExportFileStock: [Object, Array]
 });
 const exportCsvBtnName = ref('Export CSV');
@@ -214,9 +215,9 @@ const handleExportCleanUp = () => {
                     <ImportCsvModal />
                 </div>
             </header>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-gray-100">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 p-6 bg-gray-100">
                 <!-- Total Employees Card -->
-                <!-- <div class="flex items-center p-4 bg-white rounded-lg shadow-md">
+                <div class="flex items-center p-4 bg-white rounded-lg shadow-md">
                     <div class="p-3 mr-4 text-blue-500 bg-blue-100 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V3a1 1 0 00-1-1h-4a1 1 0 00-1 1v8M5 13v8a1 1 0 001 1h12a1 1 0 001-1v-8M8 21h8" />
@@ -226,10 +227,10 @@ const handleExportCleanUp = () => {
                     <p class="text-lg font-semibold text-gray-700">Total Employees</p>
                     <p class="text-2xl font-bold text-gray-900">125</p>
                     </div>
-                </div> -->
+                </div>
 
                 <!-- Active Employees Card -->
-                <!-- <div class="flex items-center p-4 bg-white rounded-lg shadow-md">
+                <div class="flex items-center p-4 bg-white rounded-lg shadow-md">
                     <div class="p-3 mr-4 text-green-500 bg-green-100 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h11m-6-6h6M4 16v4m8-6v2m8-6v4m-4-6v6" />
@@ -237,36 +238,47 @@ const handleExportCleanUp = () => {
                     </div>
                     <div>
                     <p class="text-lg font-semibold text-gray-700">Active Employees</p>
-                    <p class="text-2xl font-bold text-gray-900">100</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ statuses_with_counts?.active || 0 }}</p>
                     </div>
-                </div> -->
+                </div>
 
                 <!-- Departments Card -->
-                <!-- <div class="flex items-center p-4 bg-white rounded-lg shadow-md">
+                <div class="flex items-center p-4 bg-white rounded-lg shadow-md">
                     <div class="p-3 mr-4 text-yellow-500 bg-yellow-100 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m1-6v4M5 5v4m-4 4h16m-4 8v-4" />
                     </svg>
                     </div>
                     <div>
-                    <p class="text-lg font-semibold text-gray-700">Departments</p>
-                    <p class="text-2xl font-bold text-gray-900">8</p>
+                    <p class="text-lg font-semibold text-gray-700">Inactive Employees</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ statuses_with_counts?.inactive || 0 }}</p>
                     </div>
-                </div> -->
+                </div>
 
                 <!-- On Leave Card -->
-                <!-- <div class="flex items-center p-4 bg-white rounded-lg shadow-md">
+                <div class="flex items-center p-4 bg-white rounded-lg shadow-md">
                     <div class="p-3 mr-4 text-red-500 bg-red-100 rounded-full">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12h4m-4 0H8m6-6h4M8 6h4m4 8h4M8 18h4" />
                     </svg>
                     </div>
                     <div>
-                    <p class="text-lg font-semibold text-gray-700">On Leave</p>
-                    <p class="text-2xl font-bold text-gray-900">12</p>
+                    <p class="text-lg font-semibold text-gray-700">On Leave Employees</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ statuses_with_counts?.on_leave || 0 }}</p>
                     </div>
-                </div> -->
                 </div>
+                <div class="flex items-center p-4 bg-white rounded-lg shadow-md">
+                    <div class="p-3 mr-4 text-blue-500 bg-blue-100 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-lg font-semibold text-gray-700">Onboarding</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ statuses_with_counts?.onboarding || 0 }}</p>
+                    </div>
+                </div>
+            </div>
 
 
             <!-- Search and Filters -->

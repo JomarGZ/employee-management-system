@@ -13,16 +13,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
         $this->call([
             DepartmentSeeder::class,
             UserSeeder::class,
             EmployeeSeeder::class 
         ]);
         User::factory()->create([
-            'first_name' => 'test',
-            'last_name' => 'test',
-            'email' => 'test@example.com',
+            'first_name' => 'HR',
+            'last_name' => 'Manager',
+            'email' => 'hr@manager.com',
         ]);
     }
 }
