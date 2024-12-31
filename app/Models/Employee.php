@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\StatusesEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -35,20 +34,30 @@ class Employee extends Model
         return trim("{$this->first_name} {$this->last_name}");
     }
 
-    public function scopeSearch($query, $searchParam)
+    public function scopeSearch($query, $terms = null)
     {
-        return $query->when($searchParam, function ($query, $searchParam) {
-            return $query->whereAny([
-                'first_name',
-                'last_name',
-                'email',
-                'phone_number',
-                'status'
-            ], 'like', "%{$searchParam}%")
-            ->orWhereHas('department', function ($query) use ($searchParam) {
-                $query->where('name', 'like', "%{$searchParam}%");
+        $query->when($terms, function ($query) use ($terms) {
+            collect(str_getcsv( $terms, ' ', '"'))->filter()->each(function ($term) use ($query) {
+                $term = "{$term}%";
+                $query->whereIn('id', function ($query) use ($term) {
+                    $query->select('id')
+                        ->from(function ($query) use ($term) {
+                            $query->select('id')
+                                ->from('employees')
+                                ->where('first_name', 'like', $term)
+                                ->orWhere('last_name', 'like', $term)
+                                ->union(
+                                    $query->newQuery()
+                                        ->select('employees.id')
+                                        ->from('employees')
+                                        ->join('departments', 'departments.id', '=', 'employees.department_id')
+                                        ->where('departments.name', 'like', $term)
+                                );
+                        }, 'matches');
+                });
             });
         });
+      
     }
 
     public function scopeFilterByDepartment($query, $departmentId)

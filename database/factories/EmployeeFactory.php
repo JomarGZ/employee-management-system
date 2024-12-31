@@ -44,51 +44,5 @@ class EmployeeFactory extends Factory
             'phone_number' => fake()->phoneNumber(),
         ];
     }
-
-    
-    public function configure()
-    {
-          // Only proceed with image configuration if it's not skipped
-        if (!static::$shouldConfigure) {
-            return $this;
-        }
-        return $this->afterCreating(function ($employee) {
-            try {
-                // Create base directory if it doesn't exist
-                $baseDirectory = storage_path('app/public/employee_images');
-                if (!file_exists($baseDirectory)) {
-                    mkdir($baseDirectory, 0755, true);
-                }
-
-                // Create employee directory
-                $employeeDirectory = "{$baseDirectory}/{$employee->id}";
-                if (!file_exists($employeeDirectory)) {
-                    mkdir($employeeDirectory, 0755, true);
-                }
-                // Generate and save original image
-                $fileName = fake()->image($employeeDirectory, 300, 300, null, false, false);
-                if (!$fileName) {
-                    return $this;
-                }
-                // Update filename in database
-                $employee->image_url = $fileName;
-                $employee->save();
-                info($fileName);
-                $fullImagePath = $employeeDirectory . '/' . $fileName;
-                if (file_exists($fullImagePath)) {
-                    $thumbnailFileName = storage_path('app/public/employee_images/' . $employee->id . '/thumbnail_60_' . $fileName);
-                  
-                    $manager = new ImageManager(Driver::class);
-                    $image = $manager->read($fullImagePath);
-                    $image->resize(60, 60);
-                    $image->save($thumbnailFileName);
-                }
-                 
-            } catch (\Exception $e) {
-                // Log the error for debugging
-                \Log::error('Error in EmployeeFactory: ' . $e->getMessage());
-                throw $e;
-            }
-        });
-    }
+   
 }

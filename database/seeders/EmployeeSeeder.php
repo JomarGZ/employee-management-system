@@ -14,14 +14,6 @@ class EmployeeSeeder extends Seeder
      */
     public function run(): void
     {
-        $employeeImagePath = storage_path('app/public/employee_images');
-        if (File::exists($employeeImagePath)) {
-            File::deleteDirectory($employeeImagePath);
-        }
-        if (!file_exists($employeeImagePath)) {
-            mkdir($employeeImagePath, 0777, true);
-        }
-         
 
         Employee::factory(20)->create();
     }

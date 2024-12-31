@@ -12,6 +12,7 @@ use App\Jobs\ExportEmployeesJob;
 use App\Models\Department;
 use App\Models\Export;
 use App\Rules\EmployeeImportCsvRule;
+use App\Services\EmployeeService;
 use App\StatusesEnum;
 use DateTime;
 use Exception;
@@ -43,14 +44,16 @@ class EmployeeController extends Controller
                 'salary',
                 'image_url'
             ])
-            ->with('department')
+            ->with('department:id,name')
             ->search($search)
             ->filterByDepartment($request->query('department_id'))
             ->filterByStatus($request->query('status'))
             ->latest()
             ->paginate(5)
             ->withQueryString();
+            
             $getCsvExportFileStock = $request->user()->getFirstExportFile();
+
         return Inertia::render('Employees/Index', [
             'employees' => fn () => EmployeeResource::collection($employees),
             'departments' => fn () => DepartmentResource::collection(Department::select('id', 'name')->get()),
@@ -58,7 +61,8 @@ class EmployeeController extends Controller
             'getCsvExportFileStock' => $getCsvExportFileStock ?? [],
             'filters' => [
                 'search' => $search
-            ]
+            ],
+            'statuses_with_counts' => (new EmployeeService)->getStatusesCounts()
         ]);
     }
     /**

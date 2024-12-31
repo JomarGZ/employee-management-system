@@ -8,6 +8,11 @@ const props = defineProps({
     }
 });
 
+const getInitials = (fullName) => {
+    if (!fullName) return;
+    const words = fullName.split(" ");
+    return words.map(word => word[0]).join("");
+}
 const emit = defineEmits(['update:selectedEmployeeToEdit', 'update:isModalShow', 'onDelete']);
 
 const onEdit = () => {
@@ -28,7 +33,7 @@ const onEdit = () => {
                     </template>
                     <template v-else>
                         <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
-                            JD
+                            {{ getInitials(entity.full_name) }}
                         </div>
                     </template>
                 </div>
