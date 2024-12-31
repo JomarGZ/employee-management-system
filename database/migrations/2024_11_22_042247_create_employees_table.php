@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->string('position')->nullable();
             $table->date('hire_date')->nullable();
-            $table->string('salary')->nullable();
+            $table->unsignedBigInteger('salary')->nullable();
             $table->string('status')->nullable();
             $table->string('image_url')->nullable();
             $table->foreignIdFor(Department::class)->nullable();

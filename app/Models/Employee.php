@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Ramsey\Uuid\Type\Integer;
 
 class Employee extends Model
 {
@@ -27,11 +30,6 @@ class Employee extends Model
     public function department() 
     {
         return $this->belongsTo(Department::class);
-    }
-
-    public function getFullNameAttribute()
-    {
-        return trim("{$this->first_name} {$this->last_name}");
     }
 
     public function scopeSearch($query, $terms = null)
@@ -72,5 +70,23 @@ class Employee extends Model
         return $query->when($status, function ($query, $status) {
             $query->where('status', $status);
         });
+    }
+
+    public function salary(): Attribute
+    {
+        return Attribute::make(
+            set: fn(int $value) => $value * 100,
+            get: fn(int $value) => $value / 100,
+        );
+    }
+
+    public function getFullNameAttribute()
+    {
+        return trim("{$this->first_name} {$this->last_name}");
+    }
+
+    public static function getTotalEmployees()
+    {
+        return self::count();
     }
 }

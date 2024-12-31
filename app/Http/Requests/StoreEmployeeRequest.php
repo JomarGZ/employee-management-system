@@ -34,7 +34,7 @@ class StoreEmployeeRequest extends FormRequest
             ],
             'phone_number' => ['required', 'string', 'max:255'],
             'position' => ['required', 'string', 'max:255'],
-            'hire_date' => ['required', 'date'],
+            'hire_date' => ['required'],
             'salary' => ['required'],
             'image_url' => ['required', 'image', 'mimes:png,jpg'],
             'status' => ['required', Rule::enum(StatusesEnum::class)],

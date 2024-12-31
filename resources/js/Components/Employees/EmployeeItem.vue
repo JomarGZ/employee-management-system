@@ -1,4 +1,5 @@
 <script setup>
+import { useHelper } from '@/Composables/useHelper';
 import { Link } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -8,11 +9,8 @@ const props = defineProps({
     }
 });
 
-const getInitials = (fullName) => {
-    if (!fullName) return;
-    const words = fullName.split(" ");
-    return words.map(word => word[0]).join("");
-}
+const { getInitials } = useHelper();
+
 const emit = defineEmits(['update:selectedEmployeeToEdit', 'update:isModalShow', 'onDelete']);
 
 const onEdit = () => {
