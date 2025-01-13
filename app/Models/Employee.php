@@ -27,6 +27,11 @@ class Employee extends Model
         'thumbnail_50_image_url'
     ];
 
+    protected $casts = [
+        'hire_date' => 'datetime',
+        'salary' => 'integer',
+    ];
+
     public function department() 
     {
         return $this->belongsTo(Department::class);

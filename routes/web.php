@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\EmployeeImportController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -23,5 +24,5 @@ Route::middleware([
     Route::resource('employees', EmployeeController::class);
     Route::get('export', [EmployeeController::class, 'exportCSV'])->name('export');
     Route::delete('exports/download/{export}', [EmployeeController::class, 'exportCleanUp'])->name('employees.export.delete');
-    Route::post('import', [EmployeeController::class, 'importCSV'])->name('import');
+    Route::post('employees/Import', EmployeeImportController::class)->name('import');
 });
