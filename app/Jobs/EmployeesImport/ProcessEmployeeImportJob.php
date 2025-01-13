@@ -45,6 +45,7 @@ class ProcessEmployeeImportJob implements ShouldQueue
                 ],
                 [
                     'first_name' => $this->dataLine[$this->fieldMap['first_name']],
+                    'department_id' => $department->id,
                     'last_name' => $this->dataLine[$this->fieldMap['last_name']],
                     'phone_number' => $this->dataLine[$this->fieldMap['phone_number']],
                     'position' => $this->dataLine[$this->fieldMap['position']],
