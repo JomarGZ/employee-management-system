@@ -29,7 +29,6 @@ class Employee extends Model
 
     protected $casts = [
         'hire_date' => 'datetime',
-        'salary' => 'integer',
     ];
 
     public function department() 

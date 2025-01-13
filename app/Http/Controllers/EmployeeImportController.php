@@ -18,9 +18,9 @@ class EmployeeImportController extends Controller
      */
     public function __invoke(Request $request)
     {
-        // $request->validate([
-        //     'csv_file' => ['required', 'file', 'mimes:csv'],
-        // ]);
+        $request->validate([
+            'csv_file' => ['required', 'file', 'mimes:csv'],
+        ]);
         $file = $request->file('csv_file');
 
         $file = $file->storeAs('imports', $file->getClientOriginalName(), 'public');

@@ -45,10 +45,11 @@ class ProcessImportJob implements ShouldQueue
         $skipHeader = true;
 
         while (($line = fgetcsv(stream: $fileStream)) !== false) {
-            if ($skipHeader) {
+            if ($skipHeader || empty(array_filter($line))) {
                 $skipHeader = false;
                 continue;
             }
+
             dispatch(new ProcessEmployeeImportJob($line, $fieldMap))->onQueue('importProcess');
         }
     }
