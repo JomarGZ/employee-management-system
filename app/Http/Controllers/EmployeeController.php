@@ -2,26 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\ExportCsvStatusUpdated;
 use App\Models\Employee;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Http\Resources\DepartmentResource;
 use App\Http\Resources\EmployeeResource;
-use App\Jobs\ExportEmployeesJob;
 use App\Models\Department;
-use App\Models\Export;
-use App\Rules\EmployeeImportCsvRule;
 use App\Services\EmployeeService;
 use App\StatusesEnum;
-use DateTime;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
-use Spatie\SimpleExcel\SimpleExcelReader;
 
 class EmployeeController extends Controller
 {
@@ -155,106 +148,4 @@ class EmployeeController extends Controller
         $employee->delete();
         return to_route('employees.index')->with('message', 'Successfully deleted');
     }
-
-
-    public function exportCSV(Request $request)
-    {
-        try {
-            $authUser = $request->user();
-            $filename = 'export_employees_' . date('Y-m-d_His') . '.csv';
-            $export = $authUser->exportFile()->create([
-                'file_name' => $filename,
-                'file_path' => Storage::disk('public')->url("exports/{$filename}"),
-                'status' => 'pending'
-            ]);
-           
-            event(new ExportCsvStatusUpdated($authUser, $export));
-
-            ExportEmployeesJob::dispatch($authUser, $export);
-
-            return response()->json([
-                'message' => 'Export started. You will be notified when it\'s ready.'
-            ]);
-
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Failed to start export',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-      
-    }
-
-
-    public function exportCleanUp (Export $export) 
-    {
-       
-        Storage::disk('public')->when(
-            Storage::disk('public')->exists("exports/{$export->file_name}"),
-            fn () => Storage::disk('public')->delete("exports/{$export->file_name}")
-        );
-        
-        $export->delete();
-
-        return response()->json([
-            'success' => true,
-        'message' => 'Successfully deleted'
-        ]);
-    }
-
-    public function importCSV(Request $request)
-    {
-        $requiredHeaders = [
-            'first name',
-            'last name',
-            'email',
-            'status',
-            'position',
-            'phone number',
-            'hire date',
-            'salary',
-        ];
-
-        $request->validate([
-            'csv_file' => ['required', 'file', 'mimes:csv', 'max:10240', new EmployeeImportCsvRule($requiredHeaders)]
-        ]);
-
-        SimpleExcelReader::create($request->file('csv_file'), 'csv')
-            ->useHeaders([
-                'id',
-                'first_name',
-                'last_name',
-                'email',
-                'phone_number',
-                'position',
-                'hire_date',
-                'salary',
-                'status'
-            ])
-            ->getRows()
-            ->each(function (array $row) {
-                $reformattedRow = [
-                    'first_name' => $row['first_name'],
-                    'last_name' => $row['last_name'],
-                    'email' => $row['email'],
-                    'phone_number' => $row['phone_number'],
-                    'position' => $row['position'],
-                    'hire_date' => (new DateTime($row['hire_date']))->format('Y-m-d'),
-                    'salary' => $row['salary'],
-                    'status' => $row['status'],
-                ];
-        
-                Employee::upsert(
-                    $reformattedRow,
-                    ['first_name', 'last_name'],  // Unique identifier columns
-                    ['email', 'status', 'position']  // Columns to update if record exists
-                );
-        
-            });
-
-        return back();
-    }
-
-   
-
 }
