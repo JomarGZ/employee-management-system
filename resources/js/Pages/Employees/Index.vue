@@ -159,7 +159,7 @@ const refetchEmployeeData = async (params) => {
 const handleExport = async () => {
     exportCsvBtnName.value = 'Loading...';
     isExportProcessing.value = true;
-    await axios.get(route('export'));
+    await axios.post(route('export'));
 }
 
 const handleExportCleanUp = () => {
