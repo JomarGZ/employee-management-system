@@ -16,10 +16,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DepartmentSeeder::class,
         ]);
-        User::factory()->create([
+        User::create([
             'first_name' => 'HR',
             'last_name' => 'Manager',
             'email' => 'hr@manager.com',
+            'email_verified_at' => now(),
+            'password' => bcrypt('password'),
         ]);
     }
 }
