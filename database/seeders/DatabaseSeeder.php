@@ -15,7 +15,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             DepartmentSeeder::class,
-            EmployeeSeeder::class 
         ]);
         User::factory()->create([
             'first_name' => 'HR',
