@@ -12,6 +12,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 
 class ExportCsvStatusUpdated implements ShouldBroadcast
 {
@@ -32,6 +33,11 @@ class ExportCsvStatusUpdated implements ShouldBroadcast
         $this->user = $user;
         $this->exportedData = $exportedData;
 
+        Log::info('ExportCsvStatusUpdated event instantiated.', [
+            'user_id' => $user->id,
+            'export_data' => $exportedData->toArray(),
+        ]);
+
     }
 
     /**
@@ -41,6 +47,9 @@ class ExportCsvStatusUpdated implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
+        Log::info('ExportCsvStatusUpdated broadcasting on channel.', [
+            'channel' => "App.Models.User.{$this->user->id}"
+        ]);
         return [
             new PrivateChannel("App.Models.User.{$this->user->id}"),
         ];
@@ -48,6 +57,10 @@ class ExportCsvStatusUpdated implements ShouldBroadcast
 
     public function broadCastWith()
     {
+
+        Log::info('ExportCsvStatusUpdated broadcasting with data.', [
+            'exportedData' => $this->exportedData->toArray(),
+        ]);
         return [
             'exportedData' => $this->exportedData ?? null,
         ];
