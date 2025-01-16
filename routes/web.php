@@ -28,7 +28,3 @@ Route::middleware([
     Route::delete('exports/download/{export}', [EmployeesExportController::class, 'destroy'])->name('employees.export.delete');
     Route::post('employees/Import', EmployeeImportController::class)->name('import');
 });
-
-Route::get('test/log', function () {
-    Log::info('This is a test log');
-})->name('test');
