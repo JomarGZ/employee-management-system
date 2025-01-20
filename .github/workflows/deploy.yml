@@ -31,8 +31,6 @@ jobs:
 
     - name: Build Assets
       run: npm run build # Run the build process after dependencies are installed
-    - name: Publish package to NPM
-      run: npm publish
     
     - name: Synchronize Files To Server
       uses: easingthemes/ssh-deploy@v2.1.5
