@@ -26,12 +26,6 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Install NPM Dependencies
-      run: npm ci # Add this step to install dependencies
-
-    - name: Build Assets
-      run: npm run build # Run the build process after dependencies are installed
-    
     - name: Synchronize Files To Server
       uses: easingthemes/ssh-deploy@v2.1.5
       env:
@@ -49,8 +43,16 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /var/www/html/employee-management-system
+
+          sudo chown -R www-data:www-data .
+          sudo chmod -R 775 storage bootstrap/cache
+          composer install --optimize-autoloader --no-dev --no-interaction
+
           php artisan migrate --force
           php artisan optimize:clear
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
           php artisan optimize
 
 
