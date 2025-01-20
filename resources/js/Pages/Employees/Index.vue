@@ -14,8 +14,8 @@ const props = defineProps({
     employees: Object,
     departments: Object,
     statuses: Array,
-    filters: Array,
-    employee_counts: Array,
+    filters: Object,
+    employee_counts: Object,
     getCsvExportFileStock: [Object, Array]
 });
 const exportCsvBtnName = ref('Export CSV');
@@ -348,10 +348,10 @@ const handleExportCleanUp = () => {
                     Showing {{employees.meta.from}}-{{ employees.meta.to }} of {{ employees.meta.total }} employees
                 </div>
                 <div class="flex space-x-2">
-                    <Link :href="employees.links.prev" :disabled="! employees.links.prev" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">
+                    <Link :href="employees?.links?.prev || ''" :disabled="! employees?.links?.prev || ''" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">
                         Previous
                     </Link>
-                    <Link :href="employees.links.next" :disabled="! employees.links.next" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">
+                    <Link :href="employees?.links?.next || ''" :disabled="! employees?.links?.next || ''" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">
                         Next
                     </Link>
                 </div>

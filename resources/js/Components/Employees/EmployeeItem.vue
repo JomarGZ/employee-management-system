@@ -23,7 +23,7 @@ const onEdit = () => {
         <td class="px-6 py-4 whitespace-nowrap">
             <div class="flex items-center">
                 <div class="flex-shrink-0 h-10 w-10">
-                    <template v-if="entity.image_url?.thumbnail_60">
+                    <!-- <template v-if="entity.image_url?.thumbnail_60">
                         <img 
                             :src="entity.image_url?.thumbnail_60" 
                             class="h-10 w-10 rounded-full flex items-center justify-center"
@@ -33,7 +33,8 @@ const onEdit = () => {
                         <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
                             {{ getInitials(entity.full_name) }}
                         </div>
-                    </template>
+                    </template> -->
+                    images
                 </div>
                 <div class="ml-4">
                     <div class="text-sm font-medium text-gray-900">{{ entity.full_name }}</div>
