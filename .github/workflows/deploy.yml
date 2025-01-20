@@ -47,6 +47,6 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          cd /var/www/html/glennraya.com
+          cd /var/www/html/employee-management-system
           php artisan migrate --force
           php artisan optimize
