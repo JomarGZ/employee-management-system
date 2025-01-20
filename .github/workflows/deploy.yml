@@ -52,5 +52,8 @@ jobs:
           cd /var/www/html/employee-management-system
           php artisan migrate --force
           
-          php artisan optimize
+          php artisan config:clear
+          php artisan cache:clear
+          php artisan config:cache
+
 
