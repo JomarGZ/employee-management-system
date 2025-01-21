@@ -57,10 +57,7 @@ jobs:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: ".env"
         script: |
           cd /var/www/html/employee-management-system
           php artisan migrate --force
-          php artisan config:clear
-          php artisan config:cache
           php artisan optimize
