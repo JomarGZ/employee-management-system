@@ -51,7 +51,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /var/www/html/employee-management-system
-          ll
+          ls -a
           php artisan migrate --force
           php artisan optimize
   
