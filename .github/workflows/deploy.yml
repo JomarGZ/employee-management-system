@@ -58,7 +58,7 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: ".env"
-        script: /
+        script: |
           cd /var/www/html/employee-management-system
           composer install
           npm ci
