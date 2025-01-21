@@ -16,7 +16,9 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: 8.3
-
+    - name: Copy .nev
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+    
     - name: Install Composer Dependencies
       run: composer install --optimize-autoloader --no-dev --no-progress --no-interaction --prefer-dist
 
@@ -24,11 +26,12 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 20
-    - name: Create .nev
-      run: cp .env.example .env
-    
+   
     - name: Set Application Encryption Key
       run: php artisan key:generate --ansi
+      
+    - name: Directory Permissions
+      run: chmod -R 777 storage bootstrap/cache
 
     - name: Create Storage Link
       run: php artisan storage:link
