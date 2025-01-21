@@ -24,10 +24,13 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '20'
-
+    
     - name: Install NPM Dependencies
       run: npm install
-
+    - name: Check npm and node versions
+      run: |
+        node -v
+        npm -v
     - name: Build NPM Assets
       run: npm run build
 
