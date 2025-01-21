@@ -25,11 +25,6 @@ jobs:
       with:
         node-version: 20
 
-    - name: Directory Permissions
-      run: |
-        sudo chgrp -R www-data storage bootstrap/cache
-        sudo chmod -R ug+rwx storage bootstrap/cache
-
     - name: Install NPM Dependencies 
       run: npm ci
     - name: Check npm and node versions
@@ -56,9 +51,11 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /var/www/html/employee-management-system
-          npm install
-          npm run build
+          sudo chown -R $USER:www-data .
+          sudo find . -type f -exec chmod 664 {} \;
+          sudo find . -type d -exec chmod 775 {} \;
+          sudo chgrp -R www-data storage bootstrap/cache
+          sudo chmod -R ug+rwx storage bootstrap/cache
           php artisan migrate --force
           php artisan optimize
-    - name: Build NPM Assets
-      run: npm run build
+  
