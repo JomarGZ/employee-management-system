@@ -53,8 +53,7 @@ jobs:
         
         script: |
           cd /var/www/html/employee-management-system
-          npm install
-          npm run build
+          php artisan config:clear
+          php artisan config:cache
           php artisan migrate --force
           php artisan optimize
-          php artisan reverb:restart
