@@ -51,11 +51,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd /var/www/html/employee-management-system
-          chown -R www-data:www-data .
-          find . -type f -exec chmod 664 {} \;
-          find . -type d -exec chmod 775 {} \;
-          chgrp -R www-data storage bootstrap/cache
-          chmod -R ug+rwx storage bootstrap/cache
+          ll
           php artisan migrate --force
           php artisan optimize
   
