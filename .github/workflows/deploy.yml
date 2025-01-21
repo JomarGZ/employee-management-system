@@ -23,7 +23,7 @@ jobs:
     - name: Install Node
       uses: actions/setup-node@v3
       with:
-        node-version: '20'
+        node-version: 'v22.13.0'
     
     - name: Install NPM Dependencies
       run: npm install
@@ -55,4 +55,4 @@ jobs:
           npm run build
           php artisan migrate --force
           php artisan optimize
-          php artisan reverb:start
+          php artisan reverb:restart
