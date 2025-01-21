@@ -23,10 +23,18 @@ jobs:
     - name: Install Node
       uses: actions/setup-node@v3
       with:
-        node-version: 'v22.13.0'
+        node-version: 20
+    - name: Create .nev
+      run: cp .env.example .env
     
+    - name: Set Application Encryption Key
+      run: php artisan key:generate --ansi
+
+    - name: Create Storage Link
+      run: php artisan storage:link
+
     - name: Install NPM Dependencies
-      run: npm install
+      run: npm ci
     - name: Check npm and node versions
       run: |
         node -v
@@ -50,10 +58,12 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: ".env"
-        
-        script: |
+        script: /
           cd /var/www/html/employee-management-system
+          composer install
+          npm ci
+          npm run build
+          php artisan migrate --force
           php artisan config:clear
           php artisan config:cache
-          php artisan migrate --force
           php artisan optimize
