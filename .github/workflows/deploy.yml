@@ -27,11 +27,8 @@ jobs:
 
     - name: Directory Permissions
       run: |
-        sudo chown -R $USER:www-data storage
-        sudo chown -R $USER:www-data bootstrap/cache
-        sudo chmod -R 775 storage
-        sudo chmod -R 775 bootstrap/cache
-
+        sudo chgrp -R www-data storage bootstrap/cache
+        sudo chmod -R ug+rwx storage bootstrap/cache
 
     - name: Install NPM Dependencies 
       run: npm ci
