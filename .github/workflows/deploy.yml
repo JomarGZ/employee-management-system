@@ -27,12 +27,10 @@ jobs:
     
     - name: Install NPM Dependencies
       run: npm install
-
     - name: Check npm and node versions
       run: |
         node -v
         npm -v
-
     - name: Build NPM Assets
       run: npm run build
 
@@ -45,26 +43,18 @@ jobs:
         REMOTE_USER: ${{ secrets.VPS_USER }}
         TARGET: "/var/www/html/employee-management-system"
 
-    - name: Upload .env file
-      uses: appleboy/scp-action@v0.1.8
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: ".env"
-        target: "/var/www/html/employee-management-system/.env"
-
     - name: Run Remote/Artisan Commands
       uses: appleboy/ssh-action@v0.1.6
       with:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: ".env"
+        
         script: |
           cd /var/www/html/employee-management-system
           npm install
           npm run build
           php artisan migrate --force
           php artisan optimize
-          php artisan config:cache
-          php artisan config:clear
+          php artisan reverb:restart
