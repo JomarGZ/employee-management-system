@@ -25,18 +25,18 @@ const CsvExportFileStockLink = ref(props.getCsvExportFileStock.file_path || '');
 const CsvExportFileStockStatus = ref(props.getCsvExportFileStock.status || '');
 const CsvExportFileStock = ref(props.getCsvExportFileStock || null);
 
-// Echo.private(`App.Models.User.${usePage().props.auth.user.id}`)
-//     .listen('ExportCsvStatusUpdated', function (event) {
-//         CsvExportFileStockLink.value = event.exportedData?.file_path;
-//         CsvExportFileStockStatus.value = event.exportedData?.status;
-//         CsvExportFileStock.value = event.exportedData;
+Echo.private(`App.Models.User.${usePage().props.auth.user.id}`)
+    .listen('ExportCsvStatusUpdated', function (event) {
+        CsvExportFileStockLink.value = event.exportedData?.file_path;
+        CsvExportFileStockStatus.value = event.exportedData?.status;
+        CsvExportFileStock.value = event.exportedData;
         
-//         if (CsvExportFileStockStatus.value === 'completed' && typeof CsvExportFileStockLink.value !== 'undefined') {
-//             window.location.href = CsvExportFileStockLink.value;
-//             handleExportCleanUp();
-//         }
+        if (CsvExportFileStockStatus.value === 'completed' && typeof CsvExportFileStockLink.value !== 'undefined') {
+            window.location.href = CsvExportFileStockLink.value;
+            handleExportCleanUp();
+        }
 
-//     });
+    });
 
 const isModalShow = ref(false);
 const selectedEmployeeToEdit = ref(null);
