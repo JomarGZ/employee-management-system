@@ -22,8 +22,8 @@ class ExportEmployeesJob implements ShouldQueue
    
     protected $user;
     protected $export;
-    // public $timeout = 3600; // 1 hour timeout
-    // public $tries = 3; // Number of retries
+    public $timeout = 3600; // 1 hour timeout
+    public $tries = 3; // Number of retries
 
     public function __construct(User $user, Export $export)
     {
