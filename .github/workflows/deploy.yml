@@ -47,8 +47,8 @@ jobs:
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          rm -rf /var/www/html/employee-management-system/public/build
-          
+          npm run build
+
     - name: Run Remote/Artisan Commands
       uses: appleboy/ssh-action@v0.1.6
       with:
