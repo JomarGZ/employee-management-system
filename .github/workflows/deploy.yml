@@ -40,15 +40,6 @@ jobs:
         REMOTE_USER: ${{ secrets.VPS_USER }}
         TARGET: "/var/www/html/employee-management-system"
       
-    - name: Remove build directory on the server (optional)
-      uses: appleboy/ssh-action@v0.1.6
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          rm -rf /var/www/html/employee-management-system/public/build
-          
     - name: Run Remote/Artisan Commands
       uses: appleboy/ssh-action@v0.1.6
       with:
