@@ -42,17 +42,6 @@ jobs:
         REMOTE_HOST: ${{ secrets.VPS_HOST }}
         REMOTE_USER: ${{ secrets.VPS_USER }}
         TARGET: "/var/www/html/employee-management-system"
-    
-    - name: Run Build Command on Server
-      uses: appleboy/ssh-action@v0.1.6
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          cd /var/www/task-management-api-1
-          npm install
-          npm run build
   
     - name: Run Remote/Artisan Commands
       uses: appleboy/ssh-action@v0.1.6
