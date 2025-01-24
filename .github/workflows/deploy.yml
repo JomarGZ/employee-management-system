@@ -49,15 +49,6 @@ jobs:
         script: |
           rm -rf /var/www/html/employee-management-system/public/build
 
-    - name: Check build directory on the server
-      uses: appleboy/ssh-action@v0.1.6
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          ls -l /var/www/html/employee-management-system/public/build
-
     - name: Run Remote/Artisan Commands
       uses: appleboy/ssh-action@v0.1.6
       with:
