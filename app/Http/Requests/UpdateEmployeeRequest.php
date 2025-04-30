@@ -36,7 +36,7 @@ class UpdateEmployeeRequest extends FormRequest
             'position' => ['required', 'string', 'max:255'],
             'hire_date' => ['required', 'date'],
             'salary' => ['required'],
-            'image_url' => ['sometimes', 'image', 'mimes:png,jpg'],
+            'image_url' => ['nullable', 'image', 'mimes:png,jpg'],
             'status' => ['required', Rule::enum(StatusesEnum::class)],
             'department_id' => ['required', Rule::exists(Department::class, 'id')],
         ];
