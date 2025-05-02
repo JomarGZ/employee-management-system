@@ -20,7 +20,7 @@ const onEdit = () => {
 </script>
 <template>
       <tr>
-        <td class="px-6 py-4 whitespace-nowrap">
+        <td class="px-6 py-4 whitespace-nowrap min-w-0">
             <div class="flex items-center">
                 <div class="flex-shrink-0 h-10 w-10">
                     <template v-if="entity.image_url?.thumbnail_60">
@@ -36,14 +36,12 @@ const onEdit = () => {
                     </template>
                 </div>
                 <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900">{{ entity.full_name }}</div>
-                    <div class="text-sm text-gray-500">{{ entity.position }}</div>
+                    <div class="text-sm font-medium text-gray-900 truncate">{{ entity.full_name }}</div>
+                    <div class="text-sm text-gray-500 truncate">{{ entity.position }}</div>
                 </div>
             </div>
         </td>
-        <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-900">{{ entity.email }}</div>
-        </td>
+     
         <td class="px-6 py-4 whitespace-nowrap">
             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                 {{ entity.department?.name }}

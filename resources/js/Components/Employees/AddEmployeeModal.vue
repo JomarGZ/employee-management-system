@@ -176,6 +176,7 @@ const onModalClose = () => {
                         </label>
                         <input 
                             type="file"
+                             accept="image/*"
                             ref="photoInput"
                             @input="form.image_url = $event.target.files[0]"
                             @change="updatePhotoPreview"
